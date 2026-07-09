@@ -25,7 +25,7 @@ with TokenLabClient(api_key="YOUR_TOKENLAB_API_KEY") as tokenlab:
 
 ```python
 tokenlab.create_anthropic_message({
-    "model": "claude-sonnet-5.5",
+    "model": "claude-sonnet-5",
     "max_tokens": 512,
     "messages": [{"role": "user", "content": "Hello"}],
 })

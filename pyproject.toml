@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "tokenlab-ai"
-version = "0.1.0"
+version = "0.1.1"
 description = "Lightweight Python client for TokenLab discovery, OpenAI-compatible APIs, and native endpoints."
 readme = "README.md"
 requires-python = ">=3.9"
