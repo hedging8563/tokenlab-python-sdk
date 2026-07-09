@@ -2,10 +2,10 @@
 
 Lightweight Python client for TokenLab discovery, OpenAI-compatible APIs, and native endpoint families.
 
-The package is prepared for PyPI as `tokenlab`. Until PyPI publishing is complete, install from GitHub:
+Install from PyPI:
 
 ```bash
-pip install git+https://github.com/hedging8563/tokenlab-python-sdk.git
+pip install tokenlab-ai
 ```
 
 ## Usage
