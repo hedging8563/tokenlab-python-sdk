@@ -92,6 +92,9 @@ class TokenLabClient:
     def create_response(self, body: Mapping[str, Any]) -> Any:
         return self.request("POST", "/v1/responses", json=dict(body))
 
+    def evaluate_decisions(self, body: Mapping[str, Any]) -> Any:
+        return self.request("POST", "/v1/systemone", json=dict(body))
+
     def create_anthropic_message(self, body: Mapping[str, Any]) -> Any:
         return self.request("POST", "/v1/messages", json=dict(body))
 

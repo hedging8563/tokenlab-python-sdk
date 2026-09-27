@@ -43,6 +43,22 @@ tokenlab.get_pricing_json()
 tokenlab.get_integrations_json()
 ```
 
+## System One decisions
+
+Discover `tokenlab.list_models(category="decision")` and inspect the selected model with `get_model()` first. Decision models declare the `systemone` public operation, not a chat format.
+
+```python
+with TokenLabClient(timeout=60.0) as tokenlab:
+    decision = tokenlab.evaluate_decisions({
+        "model": "jev-1.13",
+        "state": {"ticket": "Please refund my duplicate charge."},
+        "questions": {"refund": {"type": "noul", "instructions": "Is a refund requested?"}},
+    })
+    print(decision["answers"], decision["usage"])
+```
+
+The client reads `TOKENLAB_API_KEY` from the environment. This synchronous `/v1/systemone` call preserves typed answers, probabilities, optional confidence, and usage. It is not Chat, streaming, or Batch. A decision does not authorize a refund or another side effect. Errors are returned without automatic resubmission. Available in SDK 0.1.2+.
+
 ## Base URLs
 
 - API: `https://api.tokenlab.sh`
