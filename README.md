@@ -63,4 +63,4 @@ The client reads `TOKENLAB_API_KEY` from the environment. This synchronous `/v1/
 
 - API: `https://api.tokenlab.sh`
 - OpenAI-compatible SDK base URL: `https://api.tokenlab.sh/v1`
-- OpenAPI: `https://docs.tokenlab.sh/openapi.json`
+- OpenAPI: `https://tokenlab.sh/docs/openapi.json`

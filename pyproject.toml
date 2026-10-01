@@ -25,7 +25,7 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://docs.tokenlab.sh"
+Homepage = "https://tokenlab.sh/docs"
 Repository = "https://github.com/hedging8563/tokenlab-python-sdk"
 Issues = "https://github.com/hedging8563/tokenlab-python-sdk/issues"
 
