@@ -59,6 +59,24 @@ with TokenLabClient(timeout=60.0) as tokenlab:
 
 The client reads `TOKENLAB_API_KEY` from the environment. This synchronous `/v1/systemone` call preserves typed answers, probabilities, optional confidence, and usage. It is not Chat, streaming, or Batch. A decision does not authorize a refund or another side effect. Errors are returned without automatic resubmission. Available in SDK 0.1.2+.
 
+## Handling errors
+
+Non-success responses raise `tokenlab.TokenLabError`, a `RuntimeError` subclass whose message still starts with `TokenLab request failed:`. It exposes `status_code`, `code`, `type`, `message` (from the JSON `{"error": {...}}` body, or the raw body when it is not JSON), `request_id` (the `x-request-id` header), and `retry_after` (the `Retry-After` header in seconds, or `None`). Network errors such as timeouts are raised by `httpx` unchanged.
+
+```python
+from tokenlab import TokenLabClient, TokenLabError
+
+with TokenLabClient() as tokenlab:
+    try:
+        tokenlab.create_response({"model": "gpt-5.5", "input": "Hello"})
+    except TokenLabError as err:
+        print(err.status_code, err.code, err.message, err.request_id)
+        if err.status_code == 429 and err.retry_after is not None:
+            print(f"Rate limited; you may retry after {err.retry_after} seconds")
+```
+
+The SDK never retries automatically; whether and when to resubmit is up to you. Added after SDK 0.1.4 (not yet released).
+
 ## Base URLs
 
 - API: `https://api.tokenlab.sh`
