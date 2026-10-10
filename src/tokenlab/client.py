@@ -9,6 +9,78 @@ TOKENLAB_API_BASE = "https://api.tokenlab.sh"
 TOKENLAB_OPENAI_BASE_URL = f"{TOKENLAB_API_BASE}/v1"
 
 
+class TokenLabError(RuntimeError):
+    """Raised when TokenLab returns a non-success HTTP status.
+
+    Subclasses ``RuntimeError`` for backward compatibility, and ``str(error)``
+    still starts with ``"TokenLab request failed:"`` followed by the raw body.
+    The SDK never retries automatically; use ``retry_after`` to decide yourself.
+    """
+
+    def __init__(
+        self,
+        *,
+        status_code: int,
+        message: str,
+        code: str | None = None,
+        type: str | None = None,
+        request_id: str | None = None,
+        retry_after: float | None = None,
+        body: str = "",
+    ) -> None:
+        super().__init__(f"TokenLab request failed: {body}")
+        self.status_code = status_code
+        self.code = code
+        self.type = type
+        self.message = message
+        self.request_id = request_id
+        self.retry_after = retry_after
+        self.body = body
+
+    @classmethod
+    def from_response(cls, response: httpx.Response) -> "TokenLabError":
+        body = response.text
+        message = body
+        code: str | None = None
+        error_type: str | None = None
+        try:
+            payload = response.json()
+        except ValueError:
+            payload = None
+        error = payload.get("error") if isinstance(payload, dict) else None
+        if isinstance(error, dict):
+            if error.get("message") is not None:
+                message = str(error["message"])
+            if error.get("code") is not None:
+                code = str(error["code"])
+            if error.get("type") is not None:
+                error_type = str(error["type"])
+        elif isinstance(error, str):
+            message = error
+        return cls(
+            status_code=response.status_code,
+            message=message,
+            code=code,
+            type=error_type,
+            request_id=response.headers.get("x-request-id"),
+            retry_after=_parse_retry_after(response.headers.get("retry-after")),
+            body=body,
+        )
+
+
+def _parse_retry_after(value: str | None) -> float | None:
+    """Parse a Retry-After header given in seconds; anything else yields None."""
+    if value is None:
+        return None
+    try:
+        seconds = float(value.strip())
+    except ValueError:
+        return None
+    if seconds != seconds or seconds < 0 or seconds == float("inf"):
+        return None
+    return seconds
+
+
 class TokenLabClient:
     """Small synchronous TokenLab client for discovery and native endpoints."""
 
@@ -62,7 +134,7 @@ class TokenLabClient:
         try:
             response.raise_for_status()
         except httpx.HTTPStatusError as exc:
-            raise RuntimeError(f"TokenLab request failed: {response.text}") from exc
+            raise TokenLabError.from_response(response) from exc
         return response.json() if response.content else None
 
     def list_models(self, **query: str) -> Any:
